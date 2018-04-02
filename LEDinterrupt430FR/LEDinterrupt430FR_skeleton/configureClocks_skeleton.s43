@@ -1,0 +1,24 @@
+/*------------------------------------------------------------------------------
+Sub-routine configureClocks
+Author: D. Loveless, 11/7/2016
+Editor: I. Arredondo
+  C-code equivalent:
+  CSCTL0 = CSKEY;                                       // Write clock system password (0xA500)
+  CSCTL1 |= DCORSEL + DCOFSEL2;                         // Set DCO to 16 MHz
+  CSCTL2 |= SELM__DCOCLK + SELA__VLOCLK;                // Set MCLK to be 011 (DCO) and ACLK to be 001 (VLOCLK)
+  CSCTL3 |= DIVM__1 + DIVA__8;                          // Divide ACLK by 8 (DIVA = 0011), MCLK by 1 (DIVM = 0000)
+*-----------------------------------------------------------------------------*/
+
+#include "msp430.h"                                             ; C-style pre-processor directive
+
+                name    configureClocks                         ; Module name
+                public  configureClocks                         ; Make the routine visible
+                rseg    CODE                                    ; Place program in 'CODE' segment
+   
+configureClocks:      
+                mov.w   #0xA500, &CSCTL0                        ; Write clock system password
+                bis.w   #DCORSEL + DCOFSEL2, &CSCTL1            ; Set DCO to 16 MHz
+                bis.w   #SELM__DCOCLK + SELA__VLOCLK, &CSCTL2   ; Set MCLK to be 011 (DCO) and ACLK to be 001 (VLOCLK)
+                bis.w   #DIVM__1 + DIVA__8, &CSCTL3             ; Divide ACLK by 8 (DIVA = 011), MCLK by 1 (DIVM = 000)
+                ret                                             ; Return to main
+                end

@@ -1,0 +1,186 @@
+###############################################################################
+#
+# IAR C/C++ Compiler V6.10.2.50871/W32 for MSP430         07/Nov/2016  16:11:54
+# Copyright 1996-2014 IAR Systems AB.
+# Standalone license - IAR Embedded Workbench for Texas Instruments MSP430, 8K KickStart Edition 6.10
+#
+#    __rt_version  =  3
+#    __double_size =  32
+#    __reg_r4      =  free
+#    __reg_r5      =  free
+#    __pic         =  no
+#    __core        =  430X
+#    __data_model  =  small
+#    __code_model  =  large
+#    Source file   =  
+#        C:\Documents and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\main.c
+#    Command line  =  
+#        "C:\Documents and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\main.c" -lcN "C:\Documents
+#        and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\Debug\List\" -o "C:\Documents
+#        and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\Debug\Obj\" --debug
+#        -D__MSP430FR6989__ -e --double=32 --dlib_config "C:\Program Files\IAR
+#        Systems\Embedded Workbench 7.0\430\lib\dlib\dl430xlsfn.h" --core=430X
+#        --data_model=small -Oh --multiplier=32 --multiplier_location=4C0
+#        --hw_workaround=CPU40 --hw_workaround=CPU39 --segment __data16=DATA16
+#        --segment __data20=DATA20 --code_model=large
+#    List file     =  
+#        C:\Documents and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\Debug\List\main.lst
+#    Object file   =  
+#        C:\Documents and Settings\Daniel\My
+#        Documents\IAR_Projects\LEDinterrupt430FR\Debug\Obj\main.r43
+#
+###############################################################################
+
+C:\Documents and Settings\Daniel\My Documents\IAR_Projects\LEDinterrupt430FR\main.c
+      1          #include "msp430.h"
+      2          // LED TOggle Using Interrupts
+      3          // Author: D. Loveless
+      4          // Date of Last Update: 10/18/16
+      5          // Developed for MSP430FR6989
+      6          //
+      7          // This program is used to introduce interrupts and ISRs, specifically using TIMER and PORT interrupts. 
+      8          // The RED LED is toggled at 0.5 sec intervals (1 sec blink rate), and accepts 4 button presses from P1.1, speeding
+      9          // up the blink rate by 2x each time, resetting on the last press (1 Hz, 2 Hz, 4 Hz, 8 Hz, 16 Hz, repeat). Each button
+     10          // press toggles the GREEN LED.
+     11          
+     12          int toggleCycles = 750;                                 // Constatnt used to set # of counts before entering timer ISR
+     13          int toggleTimes = 4;                                    // Constant used to hold # of button presses used to decrement timer
+     14          
+     15          void configureClocks(void)
+     16          {
+     17            CSCTL0 = CSKEY;                                       // Write clock system password (0xA500)
+     18            CSCTL1 |= DCORSEL + DCOFSEL2;                         // Set DCO to 16 MHz
+     19            CSCTL2 |= SELM__DCOCLK + SELA__VLOCLK;                // Set MCLK to be 011 (DCO) and ACLK to be 001 (VLOCLK)
+     20            CSCTL3 |= DIVM__1 + DIVA__8;                          // Divide ACLK by 8 (DIVA = 0011), MCLK by 1 (DIVM = 0000)
+     21          }
+     22          
+     23          void configureTimer(void)
+     24          {
+     25            TA0CTL |= TASSEL__ACLK + MC__UP; 			// Timer A0, source from ACLK @ 1.5KHz, count UP mode
+     26            TA0CTL &= ~ID__1;                                     // Timer A0 divide-by-1 (1500 Hz)
+     27            TA0CCR0 = toggleCycles;			        // Set the compare register 0 to 750 cycles (for a toggle every 0.5 sec)
+     28            TA0CCTL0 |= CCIE;				        // Enable timer A interrupt
+     29          }
+     30          
+     31          void configurePorts(void)
+     32          {
+     33            PMMCTL0 = PMMPW;			         	// Open PMM Module
+     34            PM5CTL0 &= ~LOCKLPM5;			                // Clear locked IO Pins
+     35            P1DIR |= BIT0;                                        // Set P1.0 (Red LED) to output
+     36            P1OUT &= ~BIT0;                                       // Initialize Red LED to be OFF
+     37            P9DIR |= BIT7;                                        // Configure P9.7 (Green LED) to be Output
+     38            P9OUT |= BIT7;                                        // Initialize Green LED to be ON
+     39            
+     40            P1DIR &= ~BIT1; 				        // Set P1.1 (Left push button) to input
+     41            P1REN |= BIT1;                                        // Enable a pull-up/down resistor on P1.1
+     42            P1OUT |= BIT1;                                        // Set to be pull-up
+     43            P1IE  = BIT1;                                         // Enable the interrupt from P1.1 (disable all other Port 1 pin interrupts)
+     44            P1IES |= BIT1;                                        // Set the interrupt to trigger on a hi-low transition
+     45          }
+     46          void main( void )
+     47          {
+     48            WDTCTL = WDTPW + WDTHOLD;                             // Stop watchdog timer to prevent time out reset
+     49            configureClocks();                                    // go to configure Clocks
+     50            configurePorts();                                     // go to configure Ports
+     51            configureTimer();                                     // go to configure TimerA0
+     52            __low_power_mode_3();                                 // Go into low power mode 3 and enable global interrupts (see intrinsics.h)
+     53            //_BIS_SR(LPM3_bits + GIE); 	                        // Go into low power mode 3 and enable global interrupts (this method works, but is depreciated; use __bis_SR_register instead)
+     54          
+     55          }
+     56          
+     57          // Port1 Interrupt Service Routine
+     58          #pragma vector=PORT1_VECTOR
+     59            __interrupt void Port_1 (void)
+     60           {
+     61             //debounce
+     62            __delay_cycles(1024000);                                  // Wait for 64us (1024000 cycles at 16MHz)
+     63            if((P1IN & BIT1) != BIT1)                             // Check that P1.3 is still depressed (i.e. if true edge)
+     64            {
+     65             P9OUT ^= BIT7;                                       // Toggle green LED
+     66             TA0CCR0 = TA0CCR0-toggleCycles/(toggleTimes+1);      // Change the compare register contents in Timer0 according the number of desired presses before resetting (even steps) 
+     67             if(TA0CCR0==0)                                       // If the number of button presses equals toggleTimes+1, i.e. TACCRO will be 0, then ...
+     68             {
+     69               TA0CCR0=toggleCycles;                              // Reset to initial blink rate
+     70             }
+     71            }
+     72            P1IFG = 0;                                            // Clear interrupt flag
+     73           }
+     74          
+     75          // Timer0 Interrupt Service Routine
+     76          #pragma vector=TIMER0_A0_VECTOR
+     77            __interrupt void Timer_A0 (void)
+     78            {
+     79              P1OUT ^= BIT0;                                      // Toggle red LED
+     80              //TA1IV &= ~TA1IV_NONE;                               // Reset interrupt flag (not necessary for Timer)
+     81            }
+
+   Maximum stack usage in bytes:
+
+   CSTACK Function
+   ------ --------
+     12   Port_1
+      4   Timer_A0
+      4   configureClocks
+      4   configurePorts
+      4   configureTimer
+      4   main
+        4   -> configurePorts
+
+
+   Segment part sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       2  ?<Initializer for toggleCycles>
+       2  ?<Initializer for toggleTimes>
+       2  ??Port_1??INTVEC 74
+       2  ??Timer_A0??INTVEC 88
+      26  ?Subroutine0
+      26  ?Subroutine1
+      66  Port_1
+       2  TA0CCR0
+       2  TA0CCTL0
+       2  TA0CTL
+       6  Timer_A0
+       2  _A_CSCTL0_L
+       2  _A_CSCTL1_L
+       2  _A_CSCTL2_L
+       2  _A_CSCTL3_L
+       2  _A_PADIR_L
+       2  _A_PAIES_L
+       2  _A_PAIE_L
+       2  _A_PAIFG_L
+       2  _A_PAIN_L
+       2  _A_PAOUT_L
+       2  _A_PAREN_L
+       2  _A_PEDIR_L
+       2  _A_PEOUT_L
+       2  _A_PM5CTL0_L
+       2  _A_PMMCTL0_L
+       2  _A_WDTCTL_L
+       0  configureClocks
+      52  configurePorts
+       0  configureTimer
+      24  main
+       2  toggleCycles
+       2  toggleTimes
+
+ 
+ 128 bytes in segment CODE
+  38 bytes in segment DATA16_AN
+   4 bytes in segment DATA16_I
+   4 bytes in segment DATA16_ID
+   4 bytes in segment INTVEC
+  72 bytes in segment ISR_CODE
+ 
+ 200 bytes of CODE  memory
+   4 bytes of CONST memory (+  4 bytes shared)
+   4 bytes of DATA  memory (+ 38 bytes shared)
+
+Errors: none
+Warnings: none

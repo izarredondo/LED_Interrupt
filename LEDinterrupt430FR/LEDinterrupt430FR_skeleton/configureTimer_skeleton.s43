@@ -1,0 +1,24 @@
+/*------------------------------------------------------------------------------
+Sub-routine configureTimer
+Author: D. Loveless, 11/7/2016
+Editor: I. Arredondo
+  C-code equivalent:
+  TA0CTL |= TASSEL__ACLK + MC__UP; 			// Timer A0, source from ACLK @ 1.5KHz, count UP mode
+  TA0CTL &= ~ID__1;                                     // Timer A0 divide-by-1 (1500 Hz)
+  TA0CCR0 = toggleCycles;			        // Set the compare register 0 to 750 cycles (for a toggle every 0.5 sec)
+  TA0CCTL0 |= CCIE;				        // Enable timer A interrupt
+*-----------------------------------------------------------------------------*/
+
+#include "msp430.h"                                             ; C-style pre-processor directive
+
+                name    configureTimer                          ; Module name
+                public  configureTimer                          ; Make the routine visible
+                rseg    CODE                                    ; Place program in 'CODE' segment
+   
+configureTimer:      
+                bis.w   #TASSEL__ACLK+MC__UP, &TA0CTL           ; Timer A0, source from ACLK @ 1.5KHz, count UP mode
+                bic.w   #ID__1, &TA0CTL                         ; Timer A0 divide-by-1 (1500 Hz)
+                mov.w   R14, &TA0CCR0                           ; Set the compare register 0 to 750 cycles (for a toggle every 0.5 sec)
+                bis.w   #CCIE, &TA0CCTL0                        ; Enable timer A interrupt
+                ret                                             ; Return to main
+                end

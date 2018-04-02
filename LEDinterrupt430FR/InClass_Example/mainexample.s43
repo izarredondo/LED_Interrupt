@@ -1,0 +1,36 @@
+/*------------------------------------------------------------------------------
+EXAMPLE:  Toggle GREEN/RED LED after set delay (Assembly-Code version)
+Author: D. Loveless, 11/8/2016
+ENEE 4710, Embedded Systems
+Developed for MSP430FR6989
+*-----------------------------------------------------------------------------*/
+
+#include "msp430.h"                             ; C-style pre-processor directive
+            name    main                        ; module name
+
+            rseg    CSTACK                      ; pre-declaration of a segment
+            rseg    CODE                        ; place program in 'CODE' segment
+
+            public  main                        ; make the main visible
+  
+main:                                           
+            mov.w   #WDTPW+WDTHOLD,&WDTCTL      ; Stop watchdog timer
+            mov.w   #PMMPW,&PMMCTL0             ; Open PMM module
+            bic.w   #LOCKLPM5,&PM5CTL0          ; Clear locked IO pins
+            bis.b   #BIT0,&P1DIR                ; Set P1.0 to output direction
+            bis.b   #BIT7,&P9DIR                ; Set P9.7 to output direction
+            bis.b   #BIT0,&P1OUT                ; Initialize P1.0 to be ON
+            bic.b   #BIT7,&P9OUT                ; Initiallize P9.7 to be OFF
+            jmp     wait                        ; Jump to wait
+toggle:                                       
+            xor.b   #BIT0,&P1OUT                ; Toggle P1.0
+            xor.b   #BIT7,&P9OUT                ; Toggle P9.7
+wait:                                           
+            mov.w   #1834,R15                   ; Place #1834 in R15, set delay of 1834 cycles
+L1:
+            dec.w   R15                         ; R15 = R15 - 1
+            jnz     L1                          ; if zero bit (Z) is not '1' (i.e. operation went is not zero), jump to L1
+            jmp     toggle                      ; otherwise jump to toggle
+            nop
+            end
+            

@@ -1,0 +1,81 @@
+/*------------------------------------------------------------------------------
+HW #7:  LED Toggle Using Interrupts (Assembly-Code version)
+Author: D. Loveless
+Editor: I. Arredondo
+Date of Last Update: 11/18/2016
+Developed for MSP430FR6989
+
+This program is used to introduce interrupts and ISRs, specifically using TIMER and PORT interrupts. 
+The RED LED is toggled at 0.5 sec intervals (1 sec blink rate), and accepts 4 button presses from P1.1, speeding
+up the blink rate by 2x each time, resetting on the last press (1 Hz, 2 Hz, 4 Hz, 8 Hz, 16 Hz, repeat). Each button
+press toggles the GREEN LED.
+*----------------------------------------------------------------------------*/
+#include "msp430.h"
+;-------------------------------------------------------------------------------
+; Housekeeping
+;-------------------------------------------------------------------------------  
+                name    main                            ; Module name
+
+                rseg    CSTACK                          ; Pre-declaration of a segment
+                rseg    CODE                            ; Place program in 'CODE' segment
+                                
+                public  main                            ; Make the main visible
+            
+                extern  configureClocks                 ; Declare sub-module configureClocks
+                extern  configurePorts                  ; Declare sub-module configurePorts
+                extern  configureTimer                  ; Declare sub-module configureTimer
+                
+;-------------------------------------------------------------------------------
+; Main Program
+;-------------------------------------------------------------------------------           
+main:           mov.w   #WDTPW+WDTHOLD,&WDTCTL          ; Stop watchdog timer
+                mov.w   #750,R14                        ; Store toggleCycles (used to set # of counts before entering timer ISR)
+                mov.w   #5,R13                          ; Store toggleTimes+1 (used to hold # of button presses used to decrement timer)
+                call    #configureClocks                ; Call configureClocks sub-module
+                call    #configurePorts                 ; Call configurePorts sub-module
+                call    #configureTimer                 ; Call configureTimer sub-module
+                bis.w   #LPM3+GIE,SR                    ; Enable global interrupts and go into LPM3
+                nop                                     ; No operation for when return from ISRs
+                
+;-------------------------------------------------------------------------------
+; Port_1 ISR
+;-------------------------------------------------------------------------------                
+
+;
+; Code for Port_1 ISR
+Port_1:         mov.w     #0x14B, R15                   ; Delay cycles                          
+                add.w     #0xFFFF, R15                  ; by 1000       
+                bic.b     #0x2, P1IFG                   ; Clear flag
+                bit.b     #0x2, &P1IN                   ; Check button press                          
+                jc        Port_1                        ; Reset if invalid press
+                
+                xor.b     #0x80, &P9OUT                 ; Toggle Green LED
+                dec.b     R13                           ; Decrement toggleTimes+1
+                rra.w     R14                           ; Divide toggleCycles by 2, increase blink rate
+                mov.w     R14, &TA0CCR0                 ; Set TimerA to new toggleCycles
+                cmp.w     #0, R13                       ; Compare if on fifth button press
+                jz        main                          ; If toggleCycles = 0, jump to main and reset blink rate
+                reti                                    ; Return from interrupt
+;
+;-------------------------------------------------------------------------------
+; Timer_A0 ISR
+;-------------------------------------------------------------------------------
+
+;
+; Code for Timer_A0 ISR
+Timer_A0:       bic.w     #0x1, TA0CCTL0                ; Clear flag
+                xor.b     #0x1, &P1OUT                  ; Toggle Red LED
+                reti                                    ; Return from interrupt
+;
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------                
+                common  INTVEC                          ; Interrupt vectors
+;-------------------------------------------------------------------------------
+                org     TIMER0_A0_VECTOR                ; Timer0_A0 Vector
+                dw      Timer_A0                        ; Define label for ISR 
+               
+                org     PORT1_VECTOR                    ; Port1 Vector
+                dw      Port_1                          ; Define label for ISR      
+                
+                end

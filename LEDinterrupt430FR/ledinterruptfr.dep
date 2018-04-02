@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project>
+  <fileVersion>2</fileVersion>
+  <fileChecksum>2377191444</fileChecksum>
+  <configuration>
+    <name>Debug</name>
+    <outputs>
+      <file>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configureClocks_skeleton.s43</file>
+      <file>$PROJ_DIR$\Debug\Obj\mainexample.r43</file>
+      <file>$PROJ_DIR$\Debug\Exe\ledinterruptfr.d43</file>
+      <file>$PROJ_DIR$\configurePorts.s43</file>
+      <file>$PROJ_DIR$\Debug\Obj\configurePorts_skeleton.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\mainasm.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\configureTimer.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.r43</file>
+      <file>$TOOLKIT_DIR$\lib\dlib\dl430xlsfn.r43</file>
+      <file>$PROJ_DIR$\mainexample.s43</file>
+      <file>$PROJ_DIR$\Debug\Obj\configurePorts.r43</file>
+      <file>$PROJ_DIR$\InClass_Example\mainexample.s43</file>
+      <file>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configurePorts_skeleton.s43</file>
+      <file>$PROJ_DIR$\LEDinterrupt430FR_skeleton\mainasm_skeleton.s43</file>
+      <file>$PROJ_DIR$\configureClocks.s43</file>
+      <file>$PROJ_DIR$\Debug\Obj\configureClocks.r43</file>
+      <file>$PROJ_DIR$\configureTimer.s43</file>
+      <file>$PROJ_DIR$\mainasm.s43</file>
+      <file>$TOOLKIT_DIR$\inc\msp430fr6989.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\configureTimer_skeleton.r43</file>
+      <file>$PROJ_DIR$\Debug\Obj\mainasm_skeleton.r43</file>
+      <file>$TOOLKIT_DIR$\inc\msp430.h</file>
+      <file>$PROJ_DIR$\..\lecture_28\main.s43</file>
+      <file>$TOOLKIT_DIR$\config\linker\lnk430fr6989.xcl</file>
+      <file>$TOOLKIT_DIR$\config\linker\multiplier32.xcl</file>
+      <file>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configureTimer_skeleton.s43</file>
+      <file>$PROJ_DIR$\Debug\Obj\configureClocks_skeleton.r43</file>
+    </outputs>
+    <file>
+      <name>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configureClocks_skeleton.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 26</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\ledinterruptfr.d43</name>
+      <inputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 23 24 26 4 19 20 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\configurePorts.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 10</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\mainexample.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\InClass_Example\mainexample.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 1</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configurePorts_skeleton.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 4</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\LEDinterrupt430FR_skeleton\mainasm_skeleton.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 20</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\configureClocks.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 15</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\configureTimer.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 6</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\mainasm.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 5</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\lecture_28\main.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 7</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\LEDinterrupt430FR_skeleton\configureTimer_skeleton.s43</name>
+      <outputs>
+        <tool>
+          <name>A430</name>
+          <file> 19</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>A430</name>
+          <file> 21 18</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>XLINK</name>
+          <file> 2</file>
+        </tool>
+      </outputs>
+    </file>
+  </configuration>
+  <configuration>
+    <name>Release</name>
+    <outputs/>
+    <forcedrebuild>
+      <name>[MULTI_TOOL]</name>
+      <tool>XLINK</tool>
+    </forcedrebuild>
+  </configuration>
+</project>
+
+

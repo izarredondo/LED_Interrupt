@@ -1,0 +1,41 @@
+/*------------------------------------------------------------------------------
+Sub-routine configurePorts
+Author: D. Loveless, 11/7/2016
+Editor: I. Arredondo
+  C-code equivalent:
+  PMMCTL0 = PMMPW;			        // Open PMM Module
+  PM5CTL0 &= ~LOCKLPM5;			        // Clear locked IO Pins
+  P1DIR |= BIT0;                                // Set P1.0 (Red LED) to output
+  P9DIR |= BIT7;                                // Configure P9.7 (Green LED) to be Output
+  P1DIR &= ~BIT1; 			        // Set P1.1 (Left push button) to input
+  P1DIR &= ~BIT2; 			        // Set P1.2 (Right push button) to input
+  P1OUT |= BIT0;                                // Initialize Red LED to be ON
+  P9OUT &= ~BIT7;                               // Initialize Green LED to be OFF
+  P1REN |= BIT1 + BIT2;                         // Enable a pull-up/down resistor on P1.1
+  P1OUT |= BIT1 + BIT2;                         // Set to be pull-up
+  P1IE  = BIT1;                                 // Enable the interrupt from P1.1 (disable all other Port 1 pin interrupts)
+  P1IES |= BIT1;                                // Set the interrupt to trigger on a hi-low transition
+  P1IFG &= ~BIT1;                               // Clear the interrupt flag
+*-----------------------------------------------------------------------------*/
+
+#include "msp430.h"                             ; C-style pre-processor directive
+
+                name    configurePorts          ; Module name
+                public  configurePorts          ; Make the routine visible
+                rseg    CODE                    ; Place program in 'CODE' segment
+   
+configurePorts:      
+                mov.w   #WDTPW+WDTHOLD, &WDTCTL ; Open PMM module
+                bic.w   #LOCKLPM5, &PM5CTL0     ; Clear locked IO pins
+                bis.b   #0x1, &P1DIR            ; Set P1.0 to output direction
+                bis.b   #0x80, &P9DIR           ; Set P9.7 to output direction
+                bis.b   #0x1, &P1OUT            ; Initialize P1.0 to be ON
+                bis.b   #0x80, &P9OUT           ; Initiallize P9.7 to be ON
+                bic.b   #0x2, &P1DIR            ; Set P1.1 to input direction
+                bis.b   #0x6, &P1REN            ; Enable pull-up/down resistors on P1.1 and P1.2
+                bis.b   #0x6, &P1OUT            ; Set to be pull-up
+                bis.b   #0x2, &P1IE             ; Enable interrupt on P1.1 (disable all other port 1 interrupts)
+                bis.b   #0x2, &P1IES            ; Set interrupt to trigger on hi-low transition
+                bic.b   #0x2, &P1IFG            ; Clear interrupt flag
+                ret                             ; Return to main
+                end
